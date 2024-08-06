@@ -1,0 +1,83 @@
+
+/* Style for home body */
+.home-body {
+    margin: 10px
+}
+
+/* Style for home title */
+.home-title {
+    text-align: center;
+    align-self: auto;
+    font-weight: bold;
+    font-size: 50px;
+    padding-top: 1.5rem;
+}
+
+/* Style for search box */
+.search-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+/* Style for search input area */
+.search-input {
+  background-color: #000000;
+  padding: 7px;
+  font-size: 16px;
+  border-radius: 15px;
+  width: 45%;
+  height: 2.5rem;
+}
+
+/* Style for search button */
+.search-button {
+  color: white;
+  margin-left: 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.selected-value-box {
+  margin-left: 20px;
+  padding: 3px;
+  font-size: 20px;
+  border-radius: 20px;
+  width: 25%;
+  height: 2.5rem;
+  background-color: rgba(90, 90, 90, 0.769);
+  color: beige;
+  text-align: center;
+}
+
+
+/* Style for title of each section */
+.context-title {
+    text-align: left;
+    align-self: auto;
+    font-weight: bold;
+    font-size: 30px;
+    padding-top: 1.2rem;
+    padding-left: 2rem
+}
+
+
+  
+
+  
+
+  .charts-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 20px;
+  }
+  
+  .chart-container {
+    width: 50%;
+    padding: 10px;
+  }
