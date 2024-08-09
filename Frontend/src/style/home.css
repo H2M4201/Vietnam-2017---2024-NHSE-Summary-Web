@@ -66,10 +66,6 @@
 }
 
 
-  
-
-  
-
   .charts-row {
     display: flex;
     justify-content: center;
@@ -78,6 +74,20 @@
   }
   
   .chart-container {
-    width: 50%;
-    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 1000px; /* Increase this value for a wider chart */
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
   }
+  
+  .chart-title {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    text-align: center;
+    color: #333;
+  }
+  

@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Home from "./components/Home";
 import Navbar from "./components/Navbar";
 import StatisticByYear from "./components/StatisticByYear";
+import ExamResult from "./components/SearchByYear";
 
 
 function App() {
@@ -15,7 +16,8 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home/>} />
-          <Route path="/StatisticByYear" element={<StatisticByYear/>} />
+          <Route path="/StatisticByYear/:year" element={<StatisticByYear/>} />
+          <Route path="/SearchResult/:year" element={<ExamResult/>} />
           {/* other routes */}
         </Routes>
       </Router>

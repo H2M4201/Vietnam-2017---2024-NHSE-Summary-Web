@@ -1,24 +1,22 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '../style/home.css';
 import TotalChart from "./TotalChart";
-import MultiBarChart from "./MultibarChart";
+import MultiBarChart from "./MultiBarChart";
 import HistogramChart from "./HistogramChart";
 import province from './province.json';
-import config from "../config";
 
 function Home() {
   const options = Object.keys(province).sort().map(function(key){
     return province[key];
   });
 
-  const [selectedValue, setSelectedValue] = useState("");
-  const [provinceCode, setProvinceCode] = useState(0);
+  // Set the default provinceCode to '0' when the component is first loaded
+  const [selectedValue, setSelectedValue] = useState(province['0']);
+  const [provinceCode, setProvinceCode] = useState('0');
   const [isOpen, setIsOpen] = useState(false);
   const [chartData, setChartData] = useState(null);
   const [CategoryData, setCategoryData] = useState(null);
-
 
   const handleInputChange = (event) => {
     setSelectedValue(event.target.value);
@@ -30,26 +28,12 @@ function Home() {
   };
 
   const handleSearchClick = () => {
-    const provinceCodeKey = Object.keys(province).find(key => province[key] === selectedValue);
+    const currentValue = selectedValue;  // Capture the current value
+    const provinceCodeKey = Object.keys(province).find(key => province[key] === currentValue);
     setProvinceCode(provinceCodeKey);
     setIsOpen(false);
-    console.log(provinceCode, provinceCodeKey)
+    console.log("Selected Value:", currentValue, "Province Code:", provinceCodeKey);
   };
-
-  useEffect(() => {
-    if (provinceCode !== null) {
-      const fetchData = async () => {
-        try {
-          const response = await axios.get(`http://localhost:9900/get_participants/${provinceCode}`);
-          setChartData(response.data);
-        } catch (error) {
-          console.error("Error fetching the data", error);
-        }
-      };
-
-      fetchData();
-    }
-  }, [provinceCode]);
 
 
   useEffect(() => {
@@ -57,7 +41,8 @@ function Home() {
       const fetchData = async () => {
         try {
           const response = await axios.get(`http://localhost:9900/get_category/${provinceCode}`);
-          setCategoryData(response.data);
+          setCategoryData(response.data.data);
+          console.log("Fetched Category Data:", response.data.data);
         } catch (error) {
           console.error("Error fetching the data", error);
         }
@@ -66,7 +51,6 @@ function Home() {
       fetchData();
     }
   }, [provinceCode]);
-
 
   return (
     <>
@@ -81,7 +65,6 @@ function Home() {
             value={selectedValue} 
             onChange={handleInputChange}
             onFocus={handleInputFocus}
-            onClick={handleSearchClick} 
           />
           <datalist id="options">
             {options.map((option, index) => (
@@ -97,10 +80,10 @@ function Home() {
         <h2 className="context-title">SỐ LƯỢNG HỌC SINH THAM DỰ</h2>
         <div className="charts-row">
           <div className="chart-container">
-            <TotalChart data={chartData}/>
+            <TotalChart province_code={provinceCode}/>
           </div>
           <div className="chart-container">
-            <MultiBarChart  />
+            <MultiBarChart />
           </div>
         </div>
         <h2 className="context-title">MÔN TOÁN</h2>
