@@ -4,6 +4,20 @@ import { useParams } from 'react-router-dom';
 import '../style/searchByYear.css';
 import province from './province.json'; // Import the province data
 
+const mapping_name = {
+  "diaLy": "Địa lý",
+  "diemTBXaHoi": "Khoa học Xã hội",
+  "gdcd": "Giáo dục Công dân",
+  "lichSu": "Lịch sử",
+  "ngoaiNgu": "Ngoại ngữ",
+  "toan": "Toán",
+  "van": "Văn",
+  "diemTBTuNhien": "Khoa học Tự nhiên",
+  "vatLy": "Vật Lý",
+  "hoaHoc": "Hóa Học",
+  "sinhHoc": "Sinh học"
+};
+
 const ExamResult = () => {
   const { year } = useParams();
   const [resultData, setResultData] = useState({ id: '', scores: {} });
@@ -91,14 +105,14 @@ const ExamResult = () => {
             <table>
               <thead>
                 <tr>
-                  <th>Môn</th>
-                  <th>Điểm</th>
+                  <th className='subject'>Môn</th>
+                  <th className='score'>Điểm</th>
                 </tr>
               </thead>
               <tbody>
                 {Object.keys(resultData.scores).map((subject) => (
                   <tr key={subject}>
-                    <td>{subject}</td>
+                    <td>{mapping_name[subject]}</td>  {/* Display the value from X */}
                     <td>{resultData.scores[subject]}</td>
                   </tr>
                 ))}

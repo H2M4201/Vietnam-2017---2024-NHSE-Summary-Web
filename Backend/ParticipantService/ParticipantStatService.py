@@ -3,10 +3,10 @@ import json
 import os
 from flask import Flask, g, jsonify, request
 from flask_cors import CORS
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import ast
 
-load_dotenv()
+load_dotenv(find_dotenv())
 TARGET_YEARS = ast.literal_eval(os.getenv('TARGET_YEARS'))
 
 app = Flask(__name__)

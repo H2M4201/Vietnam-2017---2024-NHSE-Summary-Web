@@ -28,33 +28,65 @@ body {
 }
 
 .left-box {
-  width: 45%;
+  width: 40%; /* Make the left box slightly narrower */
+  height: 50%;
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #dfdedeb3;
+  border: 3px solid #000000; /* Increase the border thickness */
+  background-color: #d1cece; /* Light background color */
   text-align: center;
+  font-size: 1.2rem;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.left-box h2  {
+  margin: 10px; /* Add some spacing between elements */
+
+}
+
+.left-box h3 {
+  margin: 10px;
+  margin-bottom: 5px;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.left-box p {
+   margin: 5px;
+   font-size: 60px;
+   font-weight: bold;
+   color: #de0909;
 }
 
 .right-table {
-  align-items: center;
   width: 50%;
   padding: 20px;
-  border: 1px solid #ddd;
+  border: 2px solid #000;  /* Thicker border */
   border-radius: 8px;
-  background-color: #fff;
+  background-color: #928f8f; /* Matching grey background */
   text-align: center;
-  
 }
 
 table {
-  width: 70%;
+  width: 100%;
+  background-color: #fff; /* White table background */
   border-collapse: collapse;
-  align-items: center;
+}
+
+.subject, .score {
+  padding: 10px;
+  text-align: center;
+  border: 2px solid #000; /* Table border */
+  font-size: 1.5rem;
+  background-color: #000;
+  color: #fff;
 }
 
 th, td {
   padding: 10px;
   text-align: center;
-  border: 0.1rem solid #ddd;
+  border: 2px solid #000; /* Table border */
+  font-size: 20px;
 }

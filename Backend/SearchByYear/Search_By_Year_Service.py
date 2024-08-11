@@ -3,12 +3,12 @@ import json
 import os
 from flask import Flask, g, jsonify, request
 from flask_cors import CORS
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import ast
 import time
 import pandas as pd
 
-load_dotenv()
+load_dotenv(find_dotenv())
 TARGET_YEARS = ast.literal_eval(os.getenv('TARGET_YEARS'))
 
 app = Flask(__name__)
@@ -47,9 +47,6 @@ def find_student_score(year, id):
 
     return jsonify({'success': True, 'data': result_dict}), 200
 
-
-        
-    
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 9902))
