@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import '../style/searchByYear.css';
+import province from './province.json'; // Import the province data
 
 const ExamResult = () => {
   const { year } = useParams();
   const [resultData, setResultData] = useState({ id: '', scores: {} });
   const [inputValue, setInputValue] = useState('');
   const [id, setId] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');  // State to hold the error message
-  const [success, setSuccess] = useState(false);  // State to hold the success status
+  const [errorMessage, setErrorMessage] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [provinceName, setProvinceName] = useState(''); // State to hold province name
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -16,7 +19,7 @@ const ExamResult = () => {
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
-      setId(inputValue);  // Update the ID when Enter is pressed
+      setId(inputValue);
     }
   };
 
@@ -41,24 +44,27 @@ const ExamResult = () => {
             scores: scores
           });
 
-          setSuccess(response.data.success);  // Set the success status
-          setErrorMessage('');  // Clear any previous error message
+          const provinceCode = data.sbd.substring(0, 2);  // Extract the first 2 characters
+          setProvinceName(province[provinceCode]);  // Update the province name
+
+          setSuccess(response.data.success);
+          setErrorMessage('');
         } catch (error) {
           if (error.response && error.response.status === 404) {
-            setErrorMessage("Không tìm thấy số báo danh");  // Set error message
-            setResultData({ id: '', scores: {} });  // Clear result data
-            setSuccess(false);  // Set success to false
+            setErrorMessage("Không tìm thấy số báo danh");
+            setResultData({ id: '', scores: {} });
+            setSuccess(false);
           } else {
             console.error("Error fetching the data", error);
-            setErrorMessage("Đã xảy ra lỗi khi tìm kiếm");  // Set a generic error message
-            setSuccess(false);  // Set success to false
+            setErrorMessage("Đã xảy ra lỗi khi tìm kiếm");
+            setSuccess(false);
           }
         }
       }
     };
 
     fetchData();
-  }, [id, year]);  // Trigger the fetch whenever id or year changes
+  }, [id, year]);
 
   return (
     <>
@@ -70,18 +76,18 @@ const ExamResult = () => {
           className="search-input" 
           value={inputValue}
           onChange={handleInputChange}
-          onKeyDown={handleKeyDown}  // Listen for Enter key press
+          onKeyDown={handleKeyDown}
         />
       </div>
-      {errorMessage && <div className="error-message">{errorMessage}</div>}  {/* Display error message if any */}
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
       {success && (
-        <div className="result-container">  {/* Conditionally render the result container */}
-          <div className="exam-info">
+        <div className="result-container">
+          <div className="left-box">
+            <h3>{provinceName}</h3>  {/* Display the province name */}
             <h2>Số báo danh</h2>
-            <p className="exam-number">{resultData.id}</p>
-            <h3>Sở GD&ĐT Thành Phố Hồ Chí Minh</h3>
+            <p className="id-number">{resultData.id}</p>
           </div>
-          <div className="scores-table">
+          <div className="right-table">
             <table>
               <thead>
                 <tr>
