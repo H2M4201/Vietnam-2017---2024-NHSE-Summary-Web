@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import '../style/statByYear.css';
-import config from "../config";
+import CustomDonutChart from "./PieChart";
 import province from './province.json';
-
 
 const StatisticByYear = () => {
   const { year } = useParams();
@@ -12,12 +11,15 @@ const StatisticByYear = () => {
     return province[key];
   });
 
-  const [selectedValue, setSelectedValue] = useState("");
-  const [provinceCode, setProvinceCode] = useState(0);
+  // Set the default provinceCode to '0' when the component is first loaded
+  const [selectedValue, setSelectedValue] = useState(province['0']);
+  const [provinceCode, setProvinceCode] = useState('0');
   const [isOpen, setIsOpen] = useState(false);
-  const [chartData, setChartData] = useState(null);
-  const [CategoryData, setCategoryData] = useState(null);
-
+  const [summaryData, setSummaryData] = useState({
+    expected: 0,
+    actual: 0,
+    participationRate: 0,
+  });
 
   const handleInputChange = (event) => {
     setSelectedValue(event.target.value);
@@ -29,56 +31,69 @@ const StatisticByYear = () => {
   };
 
   const handleSearchClick = () => {
-    const provinceCodeKey = Object.keys(province).find(key => province[key] === selectedValue);
+    const currentValue = selectedValue;  // Capture the current value
+    const provinceCodeKey = Object.keys(province).find(key => province[key] === currentValue);
     setProvinceCode(provinceCodeKey);
     setIsOpen(false);
-    console.log(provinceCode, provinceCodeKey)
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:9900/get_participants_by_year/${year}/${provinceCode}`);
+        const data = response.data.data;
+        console.log("response: ", data);
+  
+        setSummaryData({
+          expected: data.expected,
+          actual: data.actual,
+          participationRate: data.percentage
+        });
+        console.log("fetch", summaryData);
+
+      } catch (error) {
+        console.error("Error fetching the data", error);
+      }
+    };
+  
+    fetchData();
+  }, [year, provinceCode]);
 
   return (
     <div className="home-body">
-        <h1 className="home-title">THỐNG KÊ KỲ THI THPT QUỐC GIA {year}</h1>
-        <div className="search-box">
-          <input 
-            list="options" 
-            type="text"
-            placeholder="Chọn địa phương" 
-            className="search-input" 
-            value={selectedValue} 
-            onChange={handleInputChange}
-            onFocus={handleInputFocus}
-            onClick={handleSearchClick} 
-          />
-          <datalist id="options">
-            {options.map((option, index) => (
-              <option key={index} value={option} />
-            ))}
-          </datalist> 
-          <button className="search-button" onClick={handleSearchClick}>
-            <img src="magnifier.png" alt="Search" className="search-icon" />
-          </button>
-          <div className="selected-value-box">{selectedValue}</div>
-        </div>
-      <Summary />
+      <h1 className="home-title">THỐNG KÊ KỲ THI THPT QUỐC GIA {year}</h1>
+      <div className="search-box">
+        <input 
+          list="options" 
+          type="text"
+          placeholder="Chọn địa phương" 
+          className="search-input" 
+          value={selectedValue} 
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+        />
+        <datalist id="options">
+          {options.map((option, index) => (
+            <option key={index} value={option} />
+          ))}
+        </datalist> 
+        <button className="search-button" onClick={handleSearchClick}>
+          <img src="magnifier.png" alt="Search" className="search-icon" />
+        </button>
+        <div className="selected-value-box">{selectedValue}</div>
+      </div>
+      <Summary summaryData={summaryData} provinceCode={provinceCode} />
       <Charts />
     </div>
   );
 };
 
-
-const SearchBox = () => (
-  <div className="search-container">
-    <input type="text" className="search-box" placeholder="Chọn địa phương" />
-    <button className="search-button">Cả nước</button>
-  </div>
-);
-
-const Summary = () => (
+const Summary = ({ summaryData, provinceCode }) => (
   <div className="summary-container">
-    <SummaryCard title="TỔNG SỐ THÍ SINH ĐĂNG KÝ" value="923802" />
-    <SummaryCard title="TỔNG SỐ BÀI THI GHI NHẬN" value="920001" />
-    <SummaryCard title="TỶ LỆ THAM DỰ" value="99.59%" />
-    <PieChart />
+    <SummaryCard title="TỔNG SỐ THÍ SINH ĐĂNG KÝ" value={summaryData.expected} />
+    <SummaryCard title="TỔNG SỐ BÀI THI GHI NHẬN" value={summaryData.actual} />
+    <SummaryCard title="TỶ LỆ THAM DỰ" value={`${summaryData.participationRate}%`} />
+    <CustomDonutChart province_code={provinceCode} />
   </div>
 );
 
@@ -86,13 +101,6 @@ const SummaryCard = ({ title, value }) => (
   <div className="summary-card">
     <h2>{title}</h2>
     <p>{value}</p>
-  </div>
-);
-
-const PieChart = () => (
-  <div className="pie-chart">
-    <h2>PHÂN LOẠI</h2>
-    <img src="pie_chart.png" alt="Pie Chart" />
   </div>
 );
 

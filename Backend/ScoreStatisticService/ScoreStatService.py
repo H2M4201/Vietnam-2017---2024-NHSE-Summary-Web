@@ -17,9 +17,9 @@ MONGO_HOST = os.environ.get("MONGO_HOST")
 MONGO_PORT = int(os.environ.get("MONGO_PORT"))
 MONGO_DATABASE = os.environ.get("MONGO_DATABASE")
 MONGO_COLLECTION = os.environ.get("MONGO_COLLECTION")
-DEFAULT_COLLECTION_NAME = 'ParticipationStat'
+DEFAULT_COLLECTION_NAME = 'ScoreStat'
 
-class ParticipationStatService:
+class ScoreStatService:
     def __init__(self, db):
         self.collection = db[DEFAULT_COLLECTION_NAME]
 
@@ -50,7 +50,7 @@ class ParticipationStatService:
             social_participants = query_result['participation_stat']['category']['social'][str(year)]
             both_participants = query_result['participation_stat']['category']['both'][str(year)]
             independent_participants = query_result['participation_stat']['category']['independent'][str(year)]
-
+            
             result.append({
                 'year': year,
                 'science': science_participants,

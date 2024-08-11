@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../style/home.css';
 import TotalChart from "./TotalChart";
-import MultiBarChart from "./MultiBarChart";
+import StackedAreaChart from "./AreaChart";
 import HistogramChart from "./HistogramChart";
 import province from './province.json';
 
@@ -32,25 +32,8 @@ function Home() {
     const provinceCodeKey = Object.keys(province).find(key => province[key] === currentValue);
     setProvinceCode(provinceCodeKey);
     setIsOpen(false);
-    console.log("Selected Value:", currentValue, "Province Code:", provinceCodeKey);
   };
 
-
-  useEffect(() => {
-    if (provinceCode !== null) {
-      const fetchData = async () => {
-        try {
-          const response = await axios.get(`http://localhost:9900/get_category/${provinceCode}`);
-          setCategoryData(response.data.data);
-          console.log("Fetched Category Data:", response.data.data);
-        } catch (error) {
-          console.error("Error fetching the data", error);
-        }
-      };
-
-      fetchData();
-    }
-  }, [provinceCode]);
 
   return (
     <>
@@ -83,7 +66,7 @@ function Home() {
             <TotalChart province_code={provinceCode}/>
           </div>
           <div className="chart-container">
-            <MultiBarChart />
+            <StackedAreaChart province_code={provinceCode}/>
           </div>
         </div>
         <h2 className="context-title">MÔN TOÁN</h2>
