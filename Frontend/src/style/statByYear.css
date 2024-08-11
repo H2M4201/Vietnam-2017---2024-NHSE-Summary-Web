@@ -38,24 +38,44 @@
   
   .summary-container {
     display: flex;
-    justify-content: space-around;
-    margin: 20px 0;
+    justify-content: space-between; /* Space between the columns */
+    align-items: flex-start; /* Align items to the top */
+    width: 100%;
+    padding: 1.5rem;
+    padding-top: 4rem;
+  }
+  
+  .summary-cards-column {
+    display: flex;
+    flex-direction: column;
+    width: 25%; /* Adjust width as needed */
   }
   
   .summary-card {
-    background-color: #e0e0e0;
-    padding: 20px;
-    text-align: center;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 2px solid #000000;
     border-radius: 10px;
-    width: 22%;
+    text-align: center;
+    background-color: #fcfcfc;
   }
   
-  .summary-card h2 {
+  .donut-chart-column {
+    width: 50%; /* Adjust width as needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .summary-card h3 {
     color: #555;
+    font-size: 1.7rem;
+    font-weight: 300;
   }
   
   .summary-card p {
-    font-size: 24px;
+    font-size: 3rem;
     color: #ff0000;
   }
   
@@ -67,38 +87,17 @@
     border-radius: 10px;
   }
   
-  .charts-container {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    gap: 20px; /* Gap between charts */
+    margin-top: 20px;
   }
   
   .chart {
-    width: 32%;
-    background-color: #e0e0e0;
+    background-color: #fff;
     padding: 20px;
-    margin: 10px 0;
-    border-radius: 10px;
-    text-align: center;
-  }
-  
-  .chart h3 {
-    margin: 10px 0;
-  }
-  
-  .data-table {
-    width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
-  }
-  
-  .data-table th, .data-table td {
     border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
+    border-radius: 8px;
   }
   
-  .data-table th {
-    background-color: #f2f2f2;
-    color: #333;
-  }

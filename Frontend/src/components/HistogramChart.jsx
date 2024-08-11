@@ -4,21 +4,7 @@ import {
   BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 
-const data = [
-  { name: '0', value: 1000 },
-  { name: '1', value: 2000 },
-  { name: '2', value: 5000 },
-  { name: '3', value: 10000 },
-  { name: '4', value: 20000 },
-  { name: '5', value: 40000 },
-  { name: '6', value: 30000 },
-  { name: '7', value: 20000 },
-  { name: '8', value: 10000 },
-  { name: '9', value: 5000 },
-  { name: '10', value: 1000 },
-];
-
-const HistogramChart = () => (
+const HistogramChart = ({ data, xAxisLabel, yAxisLabel, barColor = "#8884d8", lineColor = "#ff7300" }) => (
   <ResponsiveContainer width="100%" height={400}>
     <BarChart
       data={data}
@@ -27,12 +13,12 @@ const HistogramChart = () => (
       }}
     >
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name" label={{ value: "Điểm số", position: "insideBottomRight", offset: 0 }} />
-      <YAxis label={{ value: "Số lượng thí sinh", angle: -90, position: "insideLeft" }} />
+      <XAxis dataKey="name" label={{ value: xAxisLabel, position: "insideBottomRight", offset: 0 }} />
+      <YAxis label={{ value: yAxisLabel, angle: -90, position: "insideLeft" }} />
       <Tooltip />
       <Legend />
-      <Bar dataKey="value" fill="#8884d8" />
-      <Line type="monotone" dataKey="value" stroke="#ff7300" dot={false} />
+      <Bar dataKey="value" fill={barColor} />
+      <Line type="monotone" dataKey="value" stroke={lineColor} dot={false} />
     </BarChart>
   </ResponsiveContainer>
 );

@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import '../style/statByYear.css';
 import CustomDonutChart from "./PieChart";
 import province from './province.json';
+import HistogramChart from './HistogramChart'; // Import the HistogramChart component
 
 const StatisticByYear = () => {
   const { year } = useParams();
@@ -11,7 +12,6 @@ const StatisticByYear = () => {
     return province[key];
   });
 
-  // Set the default provinceCode to '0' when the component is first loaded
   const [selectedValue, setSelectedValue] = useState(province['0']);
   const [provinceCode, setProvinceCode] = useState('0');
   const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +20,7 @@ const StatisticByYear = () => {
     actual: 0,
     participationRate: 0,
   });
+  const [histogramData, setHistogramData] = useState({}); // State to store histogram data
 
   const handleInputChange = (event) => {
     setSelectedValue(event.target.value);
@@ -31,33 +32,65 @@ const StatisticByYear = () => {
   };
 
   const handleSearchClick = () => {
-    const currentValue = selectedValue;  // Capture the current value
+    const currentValue = selectedValue;
     const provinceCodeKey = Object.keys(province).find(key => province[key] === currentValue);
     setProvinceCode(provinceCodeKey);
     setIsOpen(false);
   };
 
+  // Fetch summary data
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchSummaryData = async () => {
       try {
         const response = await axios.get(`http://localhost:9900/get_participants_by_year/${year}/${provinceCode}`);
         const data = response.data.data;
-        console.log("response: ", data);
-  
+        
         setSummaryData({
           expected: data.expected,
           actual: data.actual,
           participationRate: data.percentage
         });
-        console.log("fetch", summaryData);
-
       } catch (error) {
         console.error("Error fetching the data", error);
       }
     };
   
-    fetchData();
+    fetchSummaryData();
   }, [year, provinceCode]);
+
+// Fetch histogram data
+useEffect(() => {
+  const fetchHistogramData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:9901/get_score_distribution/${year}/${provinceCode}`);
+      const data = response.data.data;
+
+      // Exclude 'year', 'province_code', and 'success' and transform the remaining data
+      const excludedKeys = ['year', 'province_code', 'success'];
+      const transformedData = {};
+
+      Object.keys(data).forEach(subject => {
+        if (!excludedKeys.includes(subject)) {
+          transformedData[subject] = Object.entries(data[subject])
+            .map(([score, count]) => ({
+              name: parseFloat(score),  // Convert score to float
+              value: count,
+            }))
+            .sort((a, b) => a.name - b.name);  // Sort by score (numeric order)
+        }
+      });
+
+      setHistogramData(transformedData);
+      console.log("Transformed Histogram Data: ", transformedData);
+
+    } catch (error) {
+      console.error("Error fetching the data", error);
+    }
+  };
+
+  fetchHistogramData();
+}, [year, provinceCode]);
+
 
   return (
     <div className="home-body">
@@ -83,70 +116,44 @@ const StatisticByYear = () => {
         <div className="selected-value-box">{selectedValue}</div>
       </div>
       <Summary summaryData={summaryData} provinceCode={provinceCode} />
-      <Charts />
+      <Charts histogramData={histogramData} />
     </div>
   );
 };
 
 const Summary = ({ summaryData, provinceCode }) => (
   <div className="summary-container">
-    <SummaryCard title="TỔNG SỐ THÍ SINH ĐĂNG KÝ" value={summaryData.expected} />
-    <SummaryCard title="TỔNG SỐ BÀI THI GHI NHẬN" value={summaryData.actual} />
-    <SummaryCard title="TỶ LỆ THAM DỰ" value={`${summaryData.participationRate}%`} />
-    <CustomDonutChart province_code={provinceCode} />
+    <div className="summary-cards-column">
+      <SummaryCard title="TỔNG SỐ THÍ SINH ĐĂNG KÝ" value={summaryData.expected} />
+      <SummaryCard title="TỔNG SỐ BÀI THI GHI NHẬN" value={summaryData.actual} />
+      <SummaryCard title="TỶ LỆ THAM DỰ" value={`${summaryData.participationRate}%`} />
+    </div>
+    <div className="donut-chart-column">
+      <CustomDonutChart province_code={provinceCode} />
+    </div>
   </div>
 );
 
 const SummaryCard = ({ title, value }) => (
   <div className="summary-card">
-    <h2>{title}</h2>
+    <h3>{title}</h3>
     <p>{value}</p>
   </div>
 );
 
-const Charts = () => (
-  <div className="charts-container">
-    <Chart title="Phổ điểm môn Toán" />
-    <Chart title="Phổ điểm môn Ngữ Văn" />
-    <Chart title="Phổ điểm môn Ngoại Ngữ" />
+const Charts = ({ histogramData }) => (
+  <div className="charts-grid">
+    {Object.keys(histogramData).map(subject => (
+      <Chart key={subject} title={`Phổ điểm môn ${subject}`} data={histogramData[subject]} />
+    ))}
   </div>
 );
 
-const Chart = ({ title }) => (
+const Chart = ({ title, data }) => (
   <div className="chart">
     <h3>{title}</h3>
-    <img src="bar_chart.png" alt={title} />
-    <DataTable />
+    <HistogramChart data={data} xAxisLabel="Điểm số" yAxisLabel="Số lượng thí sinh" />
   </div>
-);
-
-const DataTable = () => (
-  <table className="data-table">
-    <thead>
-      <tr>
-        <th>Thông số</th>
-        <th>Giá trị</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Tổng số bài thi</td>
-        <td>915,645</td>
-      </tr>
-      <tr>
-        <td>Điểm trung bình</td>
-        <td>4.85</td>
-      </tr>
-      <tr>
-        <td>Mức điểm có nhiều thí sinh đạt được nhất</td>
-        <td>5.4</td>
-      </tr>
-      <tr>
-        <td>Số bài thi bị điểm liệt</td>
-        <td>1,537</td>
-      </tr>
-    </tbody>
-  </table>
 );
 
 export default StatisticByYear;

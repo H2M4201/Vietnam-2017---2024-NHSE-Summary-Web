@@ -5,17 +5,17 @@ import '../style/searchByYear.css';
 import province from './province.json'; // Import the province data
 
 const mapping_name = {
-  "diaLy": "Địa lý",
-  "diemTBXaHoi": "Khoa học Xã hội",
-  "gdcd": "Giáo dục Công dân",
-  "lichSu": "Lịch sử",
-  "ngoaiNgu": "Ngoại ngữ",
   "toan": "Toán",
   "van": "Văn",
-  "diemTBTuNhien": "Khoa học Tự nhiên",
+  "ngoaiNgu": "Ngoại ngữ",
   "vatLy": "Vật Lý",
   "hoaHoc": "Hóa Học",
-  "sinhHoc": "Sinh học"
+  "sinhHoc": "Sinh học",
+  "diemTBTuNhien": "Khoa học Tự nhiên",
+  "lichSu": "Lịch sử",
+  "diaLy": "Địa lý",
+  "gdcd": "Giáo dục Công dân",
+  "diemTBXaHoi": "Khoa học Xã hội"
 };
 
 const ExamResult = () => {

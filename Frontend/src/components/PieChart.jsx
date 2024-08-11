@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
@@ -13,8 +13,18 @@ const CustomDonutChart = ({ province_code }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`http://localhost:9900/get_category_by_year/${year}/${province_code}`);
-        setData(response.data.data);
-        console.log("Fetched data:", response.data.data);
+        const responseData = response.data.data[0]; // Assuming data is in the first object
+
+        // Transform the data into the format expected by PieChart
+        const transformedData = [
+          { name: 'Science', value: responseData.science },
+          { name: 'Social', value: responseData.social },
+          { name: 'Independent', value: responseData.independent },
+          { name: 'Both', value: responseData.both },
+        ];
+
+        setData(transformedData);
+        console.log("Transformed data:", transformedData);
       } catch (error) {
         console.error("Error fetching the data", error);
       }
@@ -26,25 +36,27 @@ const CustomDonutChart = ({ province_code }) => {
   }, [year, province_code]);
 
   return (
-    <PieChart width={400} height={400}>
-      <Pie
-        data={Array.isArray(data) ? data : []}
-        cx={200}
-        cy={200}
-        innerRadius={70}
-        outerRadius={150}
-        labelLine={false}
-        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-        fill="#8884d8"
-        dataKey="value"
-      >
-        {Array.isArray(data) && data.map((entry, index) => (
-          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-        ))}
-      </Pie>
-      <Tooltip />
-      <Legend />
-    </PieChart>
+    <ResponsiveContainer width="100%" height={400}>
+      <PieChart>
+        <Pie
+          data={data}
+          cx="50%"
+          cy="50%"
+          innerRadius="40%"
+          outerRadius="70%"
+          labelLine={false}
+          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+          fill="#8884d8"
+          dataKey="value"
+        >
+          {data.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Pie>
+        <Tooltip />
+        <Legend />
+      </PieChart>
+    </ResponsiveContainer>
   );
 }
 

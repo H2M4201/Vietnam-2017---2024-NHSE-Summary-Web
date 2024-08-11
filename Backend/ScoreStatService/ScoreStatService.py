@@ -24,7 +24,7 @@ class ScoreStatService:
     def __init__(self, db):
         self.collection = db[DEFAULT_COLLECTION_NAME]
 
-    def get_score_distribution_by_year_and_province(self, province_code, year):
+    def get_score_distribution_by_year_and_province(self, year, province_code):
         pCode = '0' + str(province_code) if province_code < 10 else str(province_code)
         query_result = self.collection.find_one({"province_code": pCode})
 
@@ -32,7 +32,9 @@ class ScoreStatService:
                 'province_code': pCode,
                 'year': year
             }
-
+        
+        for subject in SUBJECTS:
+            result[subject] = query_result[subject][str(year)]
 
         return result
 
@@ -53,22 +55,10 @@ def teardown_db(exception):
     if db is not None:
         db.client.close()
 
-@app.route('/get_score_distribution/<int:province_code>', methods=['GET'])
-def update_score_distribution_charts_by_year_and_by_province(province_code):
-    service = ParticipationStatService(g.db)
-    data = service.get_participants(province_code)
-    return jsonify({'success': True, 'data': data})
-
-@app.route('/get_category/<int:province_code>', methods=['GET'])
-def update_participant_category_chart_by_province(province_code):
-    service = ParticipationStatService(g.db)
-    data = service.get_category(province_code)
-    return jsonify({'success': True, 'data': data})
-
-@app.route('/get_subject_statistic/<int:province_code>', methods=['GET'])
-def update_subject_statistic_chart_by_province(province_code):
-    service = ParticipationStatService(g.db)
-    data = service.get_subject_statistic(province_code)
+@app.route('/get_score_distribution/<int:year>/<int:province_code>', methods=['GET'])
+def update_score_distribution_charts_by_year_and_by_province(year, province_code):
+    service = ScoreStatService(g.db)
+    data = service.get_score_distribution_by_year_and_province(year, province_code)
     return jsonify({'success': True, 'data': data})
 
 if __name__ == '__main__':
