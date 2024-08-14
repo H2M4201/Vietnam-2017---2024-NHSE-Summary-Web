@@ -91,7 +91,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* 3 columns */
     gap: 20px; /* Gap between charts */
-    margin-top: 20px;
+    margin: 1.5rem;
   }
   
   .chart {
@@ -99,5 +99,13 @@
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
+    width: 100%;
   }
-  
+
+  .chart-title {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+

@@ -30,18 +30,18 @@ const StackedAreaChart = ({ province_code }) => {
             top: 20, right: 30, left: 20, bottom: 5,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
+
           <XAxis dataKey="year" />
           <YAxis tickFormatter={(value) => `${value}`} /> {/* Display Y-axis values as percentages */}
           <Tooltip formatter={(value) => `${value}`} /> {/* Format tooltip values as percentages */}
           <Legend />
-          <Bar dataKey="science" stackId="1" fill="#8884d8" />
-          <Bar dataKey="social" stackId="1" fill="#82ca9d" />
-          <Bar dataKey="both" stackId="1" fill="#ffc658" />
-          <Bar dataKey="independent" stackId="1" fill="#ff6347" />
+          <Bar dataKey="science" stackId="1" fill="#ff1a1a" name="KHTN"/>
+          <Bar dataKey="social" stackId="1" fill="#4d4dff" name="KHXH"/>
+          <Bar dataKey="both" stackId="1" fill="#c2c2a3" name = "KHTN+KHXH"/>
+          <Bar dataKey="independent" stackId="1" fill="#33cc33" name="Thí sinh tự do"/>
         </BarChart>
       </ResponsiveContainer>
-      <h3 className="chart-title">Participants Category Overview</h3>
+      <h3 className="chart-title">Phân bổ thí sinh theo tổ hợp</h3>
     </div>
   );
 };

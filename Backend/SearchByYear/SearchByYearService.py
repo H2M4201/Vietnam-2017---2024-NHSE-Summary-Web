@@ -15,7 +15,7 @@ app = Flask(__name__)
 app.config.from_mapping(SECRET_KEY='dev')
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
-df = pd.read_csv('../MainDatabase/All_score.csv', dtype = {
+df = pd.read_csv('./MainDatabase/All_score.csv', dtype = {
     'sbd': str,
     'toan': float,
     'van': float,

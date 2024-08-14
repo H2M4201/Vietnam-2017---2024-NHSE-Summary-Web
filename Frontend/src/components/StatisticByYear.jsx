@@ -6,6 +6,20 @@ import CustomDonutChart from "./PieChart";
 import province from './province.json';
 import HistogramChart from './HistogramChart'; // Import the HistogramChart component
 
+const mapping_name = {
+  "toan": "Toán",
+  "van": "Văn",
+  "ngoaiNgu": "Ngoại ngữ",
+  "vatLy": "Vật Lý",
+  "hoaHoc": "Hóa Học",
+  "sinhHoc": "Sinh học",
+  "diemTBTuNhien": "Khoa học Tự nhiên",
+  "lichSu": "Lịch sử",
+  "diaLy": "Địa lý",
+  "gdcd": "Giáo dục Công dân",
+  "diemTBXaHoi": "Khoa học Xã hội"
+};
+
 const StatisticByYear = () => {
   const { year } = useParams();
   const options = Object.keys(province).sort().map(function(key){
@@ -66,7 +80,7 @@ useEffect(() => {
       const data = response.data.data;
 
       // Exclude 'year', 'province_code', and 'success' and transform the remaining data
-      const excludedKeys = ['year', 'province_code', 'success'];
+      const excludedKeys = ['year', 'province_code', 'success', "total"];
       const transformedData = {};
 
       Object.keys(data).forEach(subject => {
@@ -144,16 +158,39 @@ const SummaryCard = ({ title, value }) => (
 const Charts = ({ histogramData }) => (
   <div className="charts-grid">
     {Object.keys(histogramData).map(subject => (
-      <Chart key={subject} title={`Phổ điểm môn ${subject}`} data={histogramData[subject]} />
+      <Chart key={subject} title={`Phổ điểm môn ${mapping_name[subject]}`} data={histogramData[subject]} />
     ))}
   </div>
 );
 
 const Chart = ({ title, data }) => (
   <div className="chart">
-    <h3>{title}</h3>
-    <HistogramChart data={data} xAxisLabel="Điểm số" yAxisLabel="Số lượng thí sinh" />
+    <h3 className="chart-title">{title}</h3>
+    <HistogramChart data={data} />
   </div>
 );
+
+const SummaryTable = ({}) => (
+  <div className="summary-table">
+  <h3>Summary for {mapping_name[subject]}</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Year</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      {data.map((row, index) => (
+        <tr key={index}>
+          <td>{row.name}</td>
+          <td>{row.value}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+);
+
 
 export default StatisticByYear;

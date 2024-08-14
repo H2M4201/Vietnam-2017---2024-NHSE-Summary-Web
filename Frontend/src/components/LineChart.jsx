@@ -1,9 +1,9 @@
 import React from 'react';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, 
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 
-const HistogramChart = ({ data, xAxisLabel, yAxisLabel, barColor = "#8884d8", title }) => (
+const LineChartComponent = ({ data, yAxisLabel, lineColor = "#8884d8", title, straightLine = false }) => (
   <div className="chart-container">
     <h3 
       className="chart-title" 
@@ -17,27 +17,26 @@ const HistogramChart = ({ data, xAxisLabel, yAxisLabel, barColor = "#8884d8", ti
       {title}
     </h3>
     <ResponsiveContainer width="100%" height={400}>
-      <BarChart
+      <LineChart
         data={data}
         margin={{
           top: 20, right: 30, left: 20, bottom: 5,
         }}
       >
-        {/* Define the gradient */}
-        <defs>
-          <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#82ca9d" stopOpacity={0.8}/>
-          </linearGradient>
-        </defs>
-        <XAxis dataKey="name" label={{ value: xAxisLabel, position: "insideBottomRight", offset: 0 }} />
+        <XAxis dataKey="name" />
         <YAxis label={{ value: yAxisLabel, angle: -90, position: "insideLeft" }} />
         <Tooltip />
         <Legend />
-        <Bar dataKey="value" fill="url(#colorUv)" />
-      </BarChart>
+        <Line 
+          type={straightLine ? "linear" : "monotone"} 
+          dataKey="value" 
+          stroke={lineColor} 
+          strokeWidth={4}  // Make the line thicker
+          dot={{ r: 5 }}   // Increase the size of the dots
+        />
+      </LineChart>
     </ResponsiveContainer>
   </div>
 );
 
-export default HistogramChart;
+export default LineChartComponent;

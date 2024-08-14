@@ -1,14 +1,14 @@
-import pymysql
+import pymongo
 import json
 import os
 import numpy as np
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import ast
 from time import time
 import pandas as pd
 from collections import Counter
 
-load_dotenv()
+load_dotenv(find_dotenv())
 # MySQL connection details
 TARGET_YEARS = ast.literal_eval(os.getenv('TARGET_YEARS'))
 
@@ -19,153 +19,11 @@ json_file.close()
 
 subjects = ['toan', 'van', 'ngoaiNgu', 'vatLy', 'hoaHoc', 'sinhHoc', 'lichSu', 'diaLy', 'gdcd']
 
-df = pd.read_csv('../All_score.csv', dtype = {
-    'sbd': str,
-    'toan': float,
-    'van': float,
-    'ngoaiNgu': float,
-    'vatLy': float,
-    'hoaHoc': float,
-    'sinhHoc': float,
-    'diemTBTuNhien': float,
-    'diaLy': float,
-    'lichSu': float,
-    'gdcd': float,
-    'year': int
-})
-class ScoreAnalyzer:
-    def __init__(self, province_code, subjects, target_years):
-        self.conn = self.connect_to_sql()
-        self.province_code = province_code
-        self.subjects = subjects
-        self.target_years = target_years
-
-    def connect_to_sql(self):
-        connection = pymysql.connect(
-        host = os.environ.get("SQL_HOST"),
-        user = os.environ.get("SQL_USER"),
-        passwd = os.environ.get("SQL_PASSWORD"),
-        db = os.environ.get("SQL_DATABASE")
-        )
-
-        return connection
-
-    def execute_query(self, query):
-        # Simulate executing a SQL query
-        cursor = self.conn.cursor()
-        cursor.execute(query)
-
-        return cursor.fetchall()
-
-    def analyze(self):
-        result = {}
-        for pCode in self.province_code:
-            result_by_province = {}
-
-            for subject in self.subjects:
-                result_by_subject = {}
-                for year in self.target_years:
-                    query = self.build_query(pCode, subject, year)
-                    query_result = self.execute_query(query)
-                    result_by_subject[str(year)] = self.process_result(query_result)
-                
-                result_by_province[subject] = result_by_subject
-
-            result[pCode] = result_by_province
-        
-        return result
-
-    def build_query(self, pCode, subject, year):
-        raise NotImplementedError("Subclasses should implement this method.")
-
-    def process_result(self, query_result):
-        raise NotImplementedError("Subclasses should implement this method.")
-    
-
-class TotalRecordAnalyzer(ScoreAnalyzer):
-    def build_query(self, pCode, subject, year):
-        query = f"""
-            SELECT COUNT({subject}) FROM y{year}
-            WHERE sbd LIKE '{pCode}%' AND {subject} IS NOT NULL
-        """
-        if pCode == '00':
-            query = query.replace(f"sbd LIKE '{pCode}%' AND", '')
-        return query
-
-    def process_result(self, query_result):
-        return float(query_result[0][0])
-
-class AverageScoreAnalyzer(ScoreAnalyzer):
-    def build_query(self, pCode, subject, year):
-        query = f"""
-            SELECT ROUND(AVG({subject}), 2) FROM y{year} WHERE sbd LIKE '{pCode}%';
-        """
-        if pCode == '00':
-            query = query.replace(f" WHERE sbd LIKE '{pCode}%'", '')
-        return query
-
-    def process_result(self, query_result):
-        return float(query_result[0][0])
-
-class ModeScoreAnalyzer(ScoreAnalyzer):
-    def build_query(self, pCode, subject, year):
-        query = f"""
-            SELECT {subject}, COUNT({subject}) as scoreCount 
-            FROM y{year} 
-            WHERE sbd LIKE '{pCode}%'
-            GROUP BY {subject}
-            ORDER BY scoreCount DESC
-            LIMIT 1;
-        """
-        if pCode == '00':
-            query = query.replace(f" WHERE sbd LIKE '{pCode}%'", '')
-        return query
-
-    def process_result(self, query_result):
-        return float(query_result[0][0])
-
-class FullScoreCountAnalyzer(ScoreAnalyzer):
-    def build_query(self, pCode, subject, year):
-        query = f"""
-            SELECT COUNT({subject}) as scoreCount 
-            FROM y{year} 
-            WHERE sbd LIKE '{pCode}%' AND {subject} = 10;
-        """
-        if pCode == '00':
-            query = query.replace(f"sbd LIKE '{pCode}%' AND ", '')
-        return query
-
-    def process_result(self, query_result):
-        return int(query_result[0][0])
-
-class UnqualifiedScoreCountAnalyzer(ScoreAnalyzer):
-    def build_query(self, pCode, subject, year):
-        query = f"""
-            SELECT COUNT({subject}) as scoreCount 
-            FROM y{year} 
-            WHERE sbd LIKE '{pCode}%' AND {subject} <= 1;
-        """
-        if pCode == '00':
-            query = query.replace(f"sbd LIKE '{pCode}%' AND ", '')
-        return query
-
-    def process_result(self, query_result):
-        return int(query_result[0][0])
-    
-class UnderAverageScoreAnalyzer(ScoreAnalyzer):
-    def build_query(self, pCode, subject, year):
-        query = f"""
-            SELECT ROUND((COUNT(CASE WHEN {subject} < 5 THEN 1 END)) * 100.0 / COUNT({subject})) AS percentage
-            FROM y{year}
-            WHERE sbd LIKE '{pCode}%' 
-        """
-        if pCode == '00':
-            query = query.replace(f"WHERE sbd LIKE '{pCode}%'", '') 
-        return query
-
-    def process_result(self, query_result):
-        return float(query_result[0][0])
-
+MONGO_HOST = os.environ.get("MONGO_HOST")
+MONGO_PORT = int(os.environ.get("MONGO_PORT"))
+MONGO_DATABASE = os.environ.get("MONGO_DATABASE")
+MONGO_COLLECTION = os.environ.get("MONGO_COLLECTION")
+DEFAULT_COLLECTION_NAME = 'ScoringStat'
 
 
 def get_score_distribution_by_subject(df: pd.DataFrame, pCode: str, subject: str, year: int):
@@ -218,13 +76,66 @@ def get_score_distribution():
 
     return score_distribution
 
-def write_score_distribution_to_json_file():
-    with open('../Processed_Data/score_distribution_stat.json', 'w', encoding='utf-8') as f:
-        json.dump(get_score_distribution(), f)
-    f.close()
+def connect_to_mongo_collection():
+    client = pymongo.MongoClient(f"mongodb://{MONGO_HOST}:{MONGO_PORT}/{MONGO_DATABASE}")
+    db = client[MONGO_DATABASE]
+    collection = db[DEFAULT_COLLECTION_NAME]
+
+    return collection
+
+def calculate_average(score_distribution):
+    new_stats = ['total', 'average', 'unqualified', 'good', 'underAverage', 'mode']
+    total = 0
+    weighted_sum = 0
+
+    for score, count in score_distribution.items():
+        if score not in new_stats:
+            weighted_sum += float(score) * count
+            total += count
+
+    average = weighted_sum / total if total != 0 else 0
+    return round(average, 3)
+
+
+def calculate_mode(score_distribution):
+    new_stats = ['total', 'average', 'unqualified', 'good', 'underAverage', 'mode']
+    max_count = 0
+    mode_scores = 0
+
+    for score, count in score_distribution.items():
+        if score not in new_stats:
+            if count > max_count:
+                max_count = count
+                mode_scores = float(score)
+
+    # If there's more than one mode, return all of them
+    return mode_scores
+
+def update_more_stat():
+    new_stats = ['total', 'average', 'unqualified', 'good', 'underAverage', 'mode']
+    collection = connect_to_mongo_collection()
+    for pCode in province_code:
+        query_result = collection.find_one({"province_code": pCode})
+        for subject in subjects:
+            for year in TARGET_YEARS:
+                score_distribution = query_result[subject][str(year)]
+                score_distribution['total'] = sum(count for score, count in score_distribution.items() if score not in new_stats)
+                score_distribution['average'] = calculate_average(score_distribution)
+                score_distribution['mode'] = calculate_mode(score_distribution)
+                score_distribution['unqualified'] = \
+                    sum(count for score, count in score_distribution.items() if score not in new_stats and float(score) <= 1)
+                score_distribution['good'] = \
+                    sum(count for score, count in score_distribution.items() if score not in new_stats and float(score) >= 9)
+                score_distribution['underAverage'] = \
+                    sum(count for score, count in score_distribution.items() if score not in new_stats and float(score) < 5)
+            
+            collection.update_one({"province_code": pCode}, {"$set": {subject: query_result[subject]}})
+        print(pCode, 'updated')
+
+                
 
 if __name__ == '__main__':
     s = time()
-    write_score_distribution_to_json_file()
+    update_more_stat()
     e = time()
     print(e-s)

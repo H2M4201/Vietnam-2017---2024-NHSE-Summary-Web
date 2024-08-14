@@ -11,7 +11,7 @@ import ExamResult from "./components/SearchByYear";
 function App() {
 
   return (
-    <div style={{backgroundColor: "#f5f5f5", minHeight: "100vh"}}>
+    <div style={{backgroundColor: "#f5f5f5", minHeight: "200vh"}}>
       <Router>
         <Navbar />
         <Routes>

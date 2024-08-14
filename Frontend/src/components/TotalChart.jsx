@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 
 const TotalParticipants = ({ province_code }) => {
@@ -30,14 +30,14 @@ const TotalParticipants = ({ province_code }) => {
             top: 20, right: 30, left: 20, bottom: 5,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="year" />
           <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
           <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
           <Tooltip />
           <Legend />
-          <Bar yAxisId="left" dataKey="expected" fill="#8884d8" />
-          <Line yAxisId="right" type="monotone" dataKey="actual" stroke="#82ca9d" />
+          <Bar yAxisId="left" dataKey="expected" fill="#ff66ff" name="Ước tính"/>
+          <Line yAxisId="right"  type="linear"  dataKey="actual" stroke="#29a329" name="Thực tế"
+          strokeWidth={3} />
         </ComposedChart>
       </ResponsiveContainer>
       <h3 className="chart-title">Tổng số thí sinh tham dự</h3>
